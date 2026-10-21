@@ -17,12 +17,13 @@ class TelemetrySimulator(
     private val orbitRateRadPerSec: Float = 0.2f,
     private val returnSpeedMps: Float = 8f,
     private val batteryDrainPctPerSec: Float = 0.05f,
+    private val lowBatteryReturnPct: Float = 20f,
 ) {
     fun step(prev: Telemetry, dtSec: Float): Telemetry {
         val drained = if (prev.mode == FlightMode.LANDED) prev.batteryPct
                       else max(0f, prev.batteryPct - batteryDrainPctPerSec * dtSec)
 
-        return when (prev.mode) {
+        val next = when (prev.mode) {
             FlightMode.LANDED -> prev.copy(speedMps = 0f)
 
             FlightMode.TAKEOFF -> {
@@ -65,5 +66,9 @@ class TelemetrySimulator(
                 }
             }
         }
+
+        // Safety rule: below the low-battery threshold, abandon the mission and fly home.
+        val flying = next.mode == FlightMode.TAKEOFF || next.mode == FlightMode.ORBIT
+        return if (flying && next.batteryPct < lowBatteryReturnPct) next.copy(mode = FlightMode.RETURN_HOME) else next
     }
 }

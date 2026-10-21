@@ -40,4 +40,23 @@ class TelemetrySimulatorTest {
         assertEquals(0f, t.x, 0.001f)
         assertEquals(0f, t.altitudeM, 0.001f)
     }
+
+    @Test fun lowBatteryTriggersReturnHome() {
+        val start = Telemetry(x = 50f, altitudeM = 30f, batteryPct = 20.01f, mode = FlightMode.ORBIT)
+        val t = run(start, seconds = 1f)
+        assertEquals(FlightMode.RETURN_HOME, t.mode)
+    }
+
+    @Test fun lowBatteryDuringTakeoffReturnsHomeAndLands() {
+        val start = Telemetry(altitudeM = 5f, batteryPct = 19f, mode = FlightMode.TAKEOFF)
+        val t = run(start, seconds = 30f)
+        assertEquals(FlightMode.LANDED, t.mode)
+        assertEquals(0f, t.altitudeM, 0.001f)
+    }
+
+    @Test fun batteryNeverGoesBelowZero() {
+        val start = Telemetry(x = 50f, altitudeM = 30f, batteryPct = 0.1f, mode = FlightMode.RETURN_HOME)
+        val t = run(start, seconds = 60f)
+        assertTrue(t.batteryPct >= 0f)
+    }
 }

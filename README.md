@@ -14,7 +14,7 @@ TelemetrySimulator (pure Kotlin)  ──►  FlightViewModel (StateFlow)  ──
                                    Path smoothing ◄── PathMath (JNI) ◄── path_math.cpp (C++)
 ```
 
-- `data/TelemetrySimulator.kt`: physics of the fake drone (climb, orbit, fly home, land, battery drain). No Android code, so it is unit tested.
+- `data/TelemetrySimulator.kt`: physics of the fake drone (climb, orbit, fly home, land, battery drain, auto return home below 20% battery). No Android code, so it is unit tested.
 - `ui/FlightViewModel.kt`: runs the 10 Hz simulation loop and exposes one `StateFlow<FlightUiState>`. The UI only reads state and sends commands.
 - `ui/FlightScreen.kt`: Compose UI: HUD, map canvas, command buttons.
 - `cpp/path_math.cpp` + `nativebridge/PathMath.kt`: moving-average path smoothing in C++, called through JNI.
@@ -32,7 +32,7 @@ TelemetrySimulator (pure Kotlin)  ──►  FlightViewModel (StateFlow)  ──
 
 - [ ] Day 1: open, sync, run on emulator. Read each file and explain it in one sentence in `NOTES.md`.
 - [ ] Run the unit tests; add one test of your own (e.g., battery never goes below 0).
-- [ ] Add a **low-battery auto return home** rule (e.g., under 20%) and a test for it.
+- [x] Add a **low-battery auto return home** rule (e.g., under 20%) and a test for it.
 - [ ] Add a **waypoint mission**: tap the map to add points; the drone visits them in order.
 - [ ] Draw a **direction arrow** on the drone dot using its heading.
 - [ ] (Stretch) Render the path in **OpenGL ES** instead of Canvas.
